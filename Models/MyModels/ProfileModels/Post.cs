@@ -10,7 +10,7 @@
         public int RetweetCount { get; set; }
         public int ReplyCount { get; set; }
         public int ProfileId { get; set; }
-        public Profile Profile { get; set; }
+        public UserProfile Profile { get; set; }
 
     }
 }

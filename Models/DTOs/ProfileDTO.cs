@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.MyModels.ProfileModels
+namespace Models.DTOs
 {
-    public class UserProfile
+    public class UserProfileDTO
     {
-        public int Id { get; set; }
         public string UserName { get; set; }
         public string Name { get; set; }
         public string Bio { get; set; }
@@ -17,8 +16,5 @@ namespace Models.MyModels.ProfileModels
         public string Birthday { get; set; }
         public DateTime JoinTime { get; set; }
         public string Gender { get; set; }
-
-        public List<Post> Posts { get; set; }
-
     }
 }

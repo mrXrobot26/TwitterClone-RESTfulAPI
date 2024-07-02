@@ -12,13 +12,13 @@ namespace DataAcess.Context
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) :base(options){ }
 
-        public DbSet<Profile> profiles { get; set; }
+        public DbSet<UserProfile> profiles { get; set; }
         public DbSet<Post> posts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Profile>()
+            modelBuilder.Entity<UserProfile>()
                      .HasMany(p => p.Posts)
                      .WithOne(p => p.Profile)
                      .HasForeignKey(p => p.ProfileId);
