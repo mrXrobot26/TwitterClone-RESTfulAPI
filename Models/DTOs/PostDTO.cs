@@ -8,5 +8,6 @@ namespace Models.DTOs
 {
     public class PostDTO
     {
+
     }
 }
