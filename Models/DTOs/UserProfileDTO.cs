@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models.MyModels.ProfileModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,5 +17,8 @@ namespace Models.DTOs
         public string Birthday { get; set; }
         public DateTime JoinTime { get; set; }
         public string Gender { get; set; }
+
+        public List<PostDTO> Posts { get; set; }
+
     }
 }

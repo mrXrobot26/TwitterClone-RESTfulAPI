@@ -32,24 +32,29 @@ namespace TwitterClone.Controllers
                 response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "There is no user like this." }, null, false);
                 return NotFound(response);
             }
+            UserProfileDTO userProfileDTO = new UserProfileDTO();
+            userProfileDTO = mapper.Map<UserProfileDTO>(userProfile);
 
-            response.SetResponseInfo(HttpStatusCode.OK, null, userProfile);
+            response.SetResponseInfo(HttpStatusCode.OK, null, userProfileDTO);
             return Ok(response);
         }
+
 
         [HttpGet()]
         public async Task<IActionResult> GetAllUserProfile()
         {
             var response = new APIResponse();
-            var userProfile = await db.Profile.GetAllAsync();
+            var userProfileList = await db.Profile.GetAllAsync();
 
-            if (userProfile == null)
+            if (userProfileList == null || !userProfileList.Any())
             {
                 response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "No Users" }, null, false);
                 return NotFound(response);
             }
 
-            response.SetResponseInfo(HttpStatusCode.OK, null, userProfile);
+            var userProfileForGetAllUsersDTOList = mapper.Map<List<UserProfileForGetAllUsersDTO>>(userProfileList);
+
+            response.SetResponseInfo(HttpStatusCode.OK, null, userProfileForGetAllUsersDTOList);
             return Ok(response);
         }
 
@@ -63,6 +68,12 @@ namespace TwitterClone.Controllers
                 response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "User profile data is null." }, null, false);
                 return BadRequest(response);
             }
+            var existingUserProfile = await db.Profile.GetAsync(x => x.UserName == userProfileDTO.UserName);
+            if (existingUserProfile != null)
+            {
+                response.SetResponseInfo(HttpStatusCode.Conflict, new List<string> { "Username already exists." }, null, false);
+                return Conflict(response);
+            }
 
             var userProfile = mapper.Map<UserProfile>(userProfileDTO);
 
@@ -72,6 +83,8 @@ namespace TwitterClone.Controllers
             response.SetResponseInfo(HttpStatusCode.Created, null, userProfile);
             return CreatedAtAction(nameof(GetUserProfile), new { userName = userProfile.UserName }, response);
         }
+
+
         [HttpDelete]
         public async Task<IActionResult> DeleteUser(string userName)
         {

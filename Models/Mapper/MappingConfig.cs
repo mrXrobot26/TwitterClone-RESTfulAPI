@@ -13,8 +13,12 @@ namespace Models.Mapper
     {
         public MappingConfig() 
         {
-            CreateMap<UserProfileDTO, UserProfile>();
-            CreateMap<PostDTO, Post>();
+
+            CreateMap<UserProfileDTO, UserProfile>().ReverseMap();
+            CreateMap<UserProfile, UserProfileForGetAllUsersDTO>()
+                       .ForMember(userDto => userDto.UserID, user => user.MapFrom(x => x.Id));
+            CreateMap<PostDTO, Post>().ReverseMap();
+
         }
 
     }
