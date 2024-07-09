@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Models.DTOs;
+using Models.DTOs.User;
+using Models.MyModels.App;
 using Models.MyModels.ProfileModels;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,7 @@ namespace Models.Mapper
             CreateMap<UserProfile, UserProfileForGetAllUsersDTO>()
                        .ForMember(userDto => userDto.UserID, user => user.MapFrom(x => x.Id));
             CreateMap<PostDTO, Post>().ReverseMap();
+            CreateMap<UserDTO, ApplicationUser>().ReverseMap();
 
         }
 

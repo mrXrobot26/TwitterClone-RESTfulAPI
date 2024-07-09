@@ -10,6 +10,8 @@ namespace DataAcess.Repo.IRepo
     {
         IUserProfileRepository Profile { get; }
         IPostRepository Post { get; }
+        IUserRepository User { get; }
+
         Task SaveAsync();
     }
 }

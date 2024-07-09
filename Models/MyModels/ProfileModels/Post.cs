@@ -3,8 +3,6 @@
     public class Post
     {
         public int PostId { get; set; }
-        public string UserName { get; set; }
-        public string Name { get; set; }
         public string postContant { get; set; }
         public DateTime PublishedDate { get; set; }
         public int LikesCount { get; set; }

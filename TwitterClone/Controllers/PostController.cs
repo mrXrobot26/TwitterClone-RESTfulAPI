@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Azure;
 using DataAcess.Repo.IRepo;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
@@ -10,7 +11,10 @@ using System.Net;
 
 namespace TwitterClone.Controllers
 {
+
+    [Authorize]
     [Route("api/[controller]")]
+
     [ApiController]
     public class PostController : ControllerBase
     {
@@ -26,6 +30,7 @@ namespace TwitterClone.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPost(string userName, [FromBody] PostDTO postDTO)
         {
+            
             var userProfile = await db.Profile.GetAsync(x=>x.UserName == userName);
             var response = new APIResponse();
             if (userProfile == null) {
@@ -34,14 +39,11 @@ namespace TwitterClone.Controllers
             }
 
             var post = mapper.Map<Post>(postDTO);
-            post.UserName = userProfile.UserName;
             post.ProfileId = userProfile.Id;
-            post.Name = userProfile.Name;
-
 
             await db.Post.AddAsync(post);
             await db.SaveAsync();
-            response.SetResponseInfo(HttpStatusCode.Created, null, post);
+            response.SetResponseInfo(HttpStatusCode.Created, null, postDTO);
             return Ok(response);
         }
 

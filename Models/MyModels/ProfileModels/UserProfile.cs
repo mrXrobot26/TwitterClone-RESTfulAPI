@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Models.MyModels.ProfileModels
@@ -17,7 +18,7 @@ namespace Models.MyModels.ProfileModels
         public string Birthday { get; set; }
         public DateTime JoinTime { get; set; }
         public string Gender { get; set; }
-
+      //  [JsonIgnore]
         public List<Post> Posts { get; set; }
 
     }
