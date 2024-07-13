@@ -8,7 +8,6 @@ namespace DataAcess.Repo.IRepo
 {
     public interface IUnitOfWork
     {
-        IUserProfileRepository Profile { get; }
         IPostRepository Post { get; }
         IUserRepository User { get; }
 

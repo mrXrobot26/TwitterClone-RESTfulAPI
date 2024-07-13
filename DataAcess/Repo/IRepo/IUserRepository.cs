@@ -1,4 +1,6 @@
 ﻿using Models.DTOs.User;
+using Models.MyModels.App;
+using Models.MyModels.ProfileModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace DataAcess.Repo.IRepo
 {
-    public interface IUserRepository
+    public interface IUserRepository : IRepository<ApplicationUser>
     {
-        Task<bool> IsUniqe(string username);
+        Task<bool> IsUniqueUserName(string username);
         Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO);
         Task<UserDTO> Register(RegisterRequestDTO registerRequestDTO);
     }

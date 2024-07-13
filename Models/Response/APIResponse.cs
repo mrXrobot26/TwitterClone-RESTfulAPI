@@ -22,5 +22,6 @@ namespace Models.Response
             Result = result;
         }
 
+
     }
 }

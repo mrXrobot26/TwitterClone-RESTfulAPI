@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Models.MyModels.ProfileModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,17 @@ namespace Models.MyModels.App
     public class ApplicationUser : IdentityUser
     {
         public string Name { get; set; }
+
+        public string Bio { get; set; }
+        public string Location { get; set; }
+        public string Link { get; set; }
+        public DateOnly Birthday { get; set; }
+        public DateTime JoinTime { get; set; }
+        public string Gender { get; set; }
+        //  [JsonIgnore]
+        public List<Post> Posts { get; set; }
+
+
+
     }
 }

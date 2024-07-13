@@ -1,7 +1,11 @@
-﻿using DataAcess.Repo.IRepo;
+﻿using AutoMapper;
+using DataAcess.Repo.IRepo;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTOs.AppUsers;
 using Models.DTOs.User;
+using Models.MyModels.App;
 using Models.Response;
 using System.Net;
 
@@ -13,9 +17,14 @@ namespace TwitterClone.Controllers
     {
         private readonly IUnitOfWork unitOfWork;
         private APIResponse response;
-        public UserController(IUnitOfWork unitOfWork)
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly IMapper mapper;
+
+        public UserController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager ,IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
+            this.userManager = userManager;
+            this.mapper = mapper;
             response = new APIResponse();
         }
 
@@ -32,25 +41,50 @@ namespace TwitterClone.Controllers
             return Ok(response);
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestDTO model)
-        {
-            bool isUniqe = await unitOfWork.User.IsUniqe(model.UserName);
-            if (!isUniqe)
-            {
-                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "User Name Already Exist" }, null, false);
-                return BadRequest(response);
-            }
-            var user = await unitOfWork.User.Register(model);
-            if (user == null)
-            {
-                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Error While Registering" }, null, false);
-                return BadRequest(response);
-            }
-            response.SetResponseInfo(HttpStatusCode.OK, null, user, true);
-            return Ok(response);
 
+
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] ApplicationUserToAddUserDTO model)
+        {
+            var response = new APIResponse();
+
+            if (model == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Registration data is null." }, null, false);
+                return BadRequest(response);
+            }
+
+            bool isUnique = await unitOfWork.User.IsUniqueUserName(model.UserName);
+            if (!isUnique)
+            {
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "User Name Already Exists" }, null, false);
+                return BadRequest(response);
+            }
+
+            var user = mapper.Map<ApplicationUser>(model);
+
+
+            try
+            {
+                var result = await userManager.CreateAsync(user, model.Password);
+                if (!result.Succeeded)
+                {
+                    response.SetResponseInfo(HttpStatusCode.BadRequest, result.Errors.Select(e => e.Description).ToList(), null, false);
+                    return BadRequest(response);
+                }
+
+
+                response.SetResponseInfo(HttpStatusCode.Created, null, user, true);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.SetResponseInfo(HttpStatusCode.InternalServerError, new List<string> { "An error occurred while registering the user.", ex.Message }, null, false);
+                return StatusCode(500, response);
+            }
         }
+
 
 
     }

@@ -17,6 +17,8 @@ namespace DataAcess.Repo
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
         public IUserRepository User { get; private set; }
+        public IPostRepository Post { get; private set; }
+
 
         private readonly IConfiguration configuration;
         private readonly UserManager<ApplicationUser> userManager;
@@ -28,13 +30,10 @@ namespace DataAcess.Repo
             this.configuration = configuration;
             this.userManager = userManager;
             this.roleManager = roleManager;
-            Profile = new UserProfileRepository(_db, _mapper);
             Post = new PostRepository(_db, _mapper);
             User = new UserRepository(db, configuration, userManager, mapper, roleManager);
         }
 
-        public IUserProfileRepository Profile { get; private set; }
-        public IPostRepository Post { get; private set; }
 
 
         public async Task SaveAsync()

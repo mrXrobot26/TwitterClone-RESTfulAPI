@@ -14,17 +14,16 @@ namespace DataAcess.Context
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) :base(options){ }
 
-        public DbSet<UserProfile> profiles { get; set; }
         public DbSet<Post> posts { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<UserProfile>()
-                     .HasMany(p => p.Posts)
-                     .WithOne(p => p.Profile)
-                     .HasForeignKey(p => p.ProfileId);
+            //modelBuilder.Entity<Post>()
+            //          .HasOne(p => p.ApplicationUser)
+            //          .WithMany(u => u.Posts)
+            //          .HasForeignKey(p => p.ApplicationUserId);
         }
     }
     

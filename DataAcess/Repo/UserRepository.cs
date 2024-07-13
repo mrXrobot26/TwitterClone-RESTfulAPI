@@ -2,52 +2,47 @@
 using DataAcess.Context;
 using DataAcess.Repo.IRepo;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Models.DTOs.User;
 using Models.MyModels.App;
+using Models.MyModels.ProfileModels;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace DataAcess.Repo
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : Repository<ApplicationUser>, IUserRepository
     {
         private readonly ApplicationDbContext db;
         private readonly IMapper mapper;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration configuration;
-        private string securityKay = "sakfhkshakfskahfksanckasgfgviy";
-        public UserRepository(ApplicationDbContext db, IConfiguration configuration, UserManager<ApplicationUser> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager)
+        private string securityKey;
+
+        public UserRepository(ApplicationDbContext db, IConfiguration configuration, UserManager<ApplicationUser> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager) : base(db)
         {
             this.db = db;
             this.configuration = configuration;
             this.userManager = userManager;
             this.mapper = mapper;
             this.roleManager = roleManager;
-            securityKay = configuration.GetValue<string>("ApiSettings:Secret");
-
+            securityKey = configuration.GetValue<string>("ApiSettings:Secret");
         }
-        public async Task<bool> IsUniqe(string username)
+
+        public async Task<bool> IsUniqueUserName(string username)
         {
-            var matchUsername = db.ApplicationUsers.FirstOrDefault(x => x.UserName == username);
-            if (matchUsername == null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            var matchUsername = await userManager.FindByNameAsync(username);
+            return matchUsername == null;
         }
 
         public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
         {
-            var user = db.ApplicationUsers.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower());
-            var isValid = await userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
-            if (user == null && isValid == false)
+            var user = await userManager.FindByNameAsync(loginRequestDTO.UserName);
+            if (user == null || !await userManager.CheckPasswordAsync(user, loginRequestDTO.Password))
             {
                 return new LoginResponseDTO()
                 {
@@ -56,52 +51,57 @@ namespace DataAcess.Repo
                 };
             }
 
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(securityKay);
-            var tokenDescriper = new SecurityTokenDescriptor()
+            var claims = new List<Claim>
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name,user.UserName.ToString()),
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName)
             };
-            var token = handler.CreateToken(tokenDescriper);
-            LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
+
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(securityKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(7),
+                signingCredentials: creds);
+
+            return new LoginResponseDTO()
             {
-                Token = handler.WriteToken(token),
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
                 User = mapper.Map<UserDTO>(user),
             };
-            return loginResponseDTO;
-
         }
 
         public async Task<UserDTO> Register(RegisterRequestDTO registerRequestDTO)
         {
-            ApplicationUser user = new()
+            var user = new ApplicationUser
             {
                 UserName = registerRequestDTO.UserName,
                 Name = registerRequestDTO.Name,
-                Email = registerRequestDTO.UserName,
-                NormalizedEmail = registerRequestDTO.UserName.ToUpper(),
+                Email = registerRequestDTO.Email,
+                NormalizedEmail = registerRequestDTO.Email.ToUpper()
             };
+
+            var userDTO = new UserDTO();
+
             try
             {
                 var result = await userManager.CreateAsync(user, registerRequestDTO.Password);
                 if (result.Succeeded)
                 {
-                    var userToReturn = db.ApplicationUsers
-                        .FirstOrDefault(u => u.UserName == registerRequestDTO.UserName);
-                    return mapper.Map<UserDTO>(userToReturn);
+                    userDTO = mapper.Map<UserDTO>(user);
+                }
+                else
+                {
+                    userDTO.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                
+                userDTO.ErrorMessages = new List<string> { "An unexpected error occurred while registering the user." };
             }
 
-            return new UserDTO();
+            return userDTO;
         }
     }
 }
