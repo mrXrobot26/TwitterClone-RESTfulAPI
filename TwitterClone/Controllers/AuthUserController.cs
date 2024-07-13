@@ -13,14 +13,14 @@ namespace TwitterClone.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class AuthUserController : ControllerBase
     {
         private readonly IUnitOfWork unitOfWork;
         private APIResponse response;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
-        public UserController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager ,IMapper mapper)
+        public AuthUserController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager ,IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
             this.userManager = userManager;
@@ -32,7 +32,7 @@ namespace TwitterClone.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO model)
         {
             var responseLogin = await unitOfWork.User.Login(model);
-            if (responseLogin.User == null || String.IsNullOrEmpty(responseLogin.Token))
+            if (responseLogin.User == null || string.IsNullOrEmpty(responseLogin.Token))
             {
                 response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Username or password is incorrect" }, null, false);
                 return BadRequest(response);

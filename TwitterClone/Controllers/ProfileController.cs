@@ -9,6 +9,7 @@ using Models.MyModels.App;
 using Models.MyModels.ProfileModels;
 using Models.Response;
 using System.Net;
+using System.Security.Claims;
 
 namespace TwitterClone.Controllers
 {
@@ -24,16 +25,17 @@ namespace TwitterClone.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet("{userName}")]
-        public async Task<IActionResult> GetUserProfile(string userName)
+        [HttpGet("myProfile")]
+        public async Task<IActionResult> GetMyProfile()
         {
+            var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var response = new APIResponse();
-            var userProfile = await db.User.GetAsync(x => x.UserName == userName, includes: "Posts");
+            var userProfile = await db.User.GetAsync(x => x.Id == id, includes: "Posts");
 
             if (userProfile == null)
             {
-                response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "There is no user like this." }, null, false);
-                return NotFound(response);
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized" }, null, false);
+                return Unauthorized(response);
             }
             ApplicationUserDTO userProfileDTO = new ApplicationUserDTO();
             userProfileDTO = mapper.Map<ApplicationUserDTO>(userProfile);
@@ -43,23 +45,23 @@ namespace TwitterClone.Controllers
         }
 
 
-        [HttpGet()]
-        public async Task<IActionResult> GetAllUserProfile()
-        {
-            var response = new APIResponse();
-            var userProfileList = await db.User.GetAllAsync();
+        //[HttpGet()]
+        //public async Task<IActionResult> GetAllUserProfile()
+        //{
+        //    var response = new APIResponse();
+        //    var userProfileList = await db.User.GetAllAsync();
 
-            if (userProfileList == null || !userProfileList.Any())
-            {
-                response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "No Users" }, null, false);
-                return NotFound(response);
-            }
+        //    if (userProfileList == null || !userProfileList.Any())
+        //    {
+        //        response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "No Users" }, null, false);
+        //        return NotFound(response);
+        //    }
 
-            var userProfileForGetAllUsersDTOList = mapper.Map<List<UserProfileForGetAllUsersDTO>>(userProfileList);
+        //    var userProfileForGetAllUsersDTOList = mapper.Map<List<UserProfileForGetAllUsersDTO>>(userProfileList);
 
-            response.SetResponseInfo(HttpStatusCode.OK, null, userProfileForGetAllUsersDTOList);
-            return Ok(response);
-        }
+        //    response.SetResponseInfo(HttpStatusCode.OK, null, userProfileForGetAllUsersDTOList);
+        //    return Ok(response);
+        //}
 
 
         //[HttpPut("{userName}")]

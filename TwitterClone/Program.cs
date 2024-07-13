@@ -14,14 +14,15 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-          options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<UserManager<ApplicationUser>>();
-builder.Services.AddScoped<SignInManager<ApplicationUser>>();
-builder.Services.AddScoped<RoleManager<IdentityRole>>();
 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -41,10 +42,10 @@ builder.Services.AddSwaggerGen(options =>
             new OpenApiSecurityScheme
             {
                 Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            },
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
                 Scheme = "oauth2",
                 Name = "Bearer",
                 In = ParameterLocation.Header
@@ -54,45 +55,35 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
+var key = Encoding.ASCII.GetBytes(builder.Configuration["ApiSettings:Secret"]);
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-    .AddJwtBearer(options =>
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["ApiSettings:Secret"])),
-            ValidateIssuer = false,
-            ValidateAudience = false
-        };
-    });
-
-
-
-
-
-builder.Services.AddIdentity<ApplicationUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
-
-
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -31,7 +31,7 @@ namespace TwitterClone.Controllers
             this.mapper = mapper;
         }
 
-        [HttpPost]
+        [HttpPost , Authorize]
         public async Task<IActionResult> AddPost([FromBody] PostDTO postDTO)
         {
             var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
