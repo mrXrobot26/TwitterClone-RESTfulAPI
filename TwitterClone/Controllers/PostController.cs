@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Models.DTOs;
+using Models.DTOs.Post;
 using Models.MyModels.App;
 using Models.MyModels.ProfileModels;
 using Models.Response;
@@ -31,7 +31,7 @@ namespace TwitterClone.Controllers
             this.mapper = mapper;
         }
 
-        [HttpPost , Authorize]
+        [HttpPost("AddTweet") , Authorize]
         public async Task<IActionResult> AddPost([FromBody] PostDTO postDTO)
         {
             var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -59,7 +59,77 @@ namespace TwitterClone.Controllers
             return Ok(response);
         }
 
+        [HttpDelete("DeleteTweet"), Authorize]
+        public async Task<IActionResult> DeletePost(int id)
+        {
+            var response = new APIResponse();
+            var post = await db.Post.GetAsync(x => x.PostId == id);
 
+            if (post == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "Post not found" }, null, false);
+                return NotFound(response);
+            }
+
+            var appUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (appUserId == null || post.ApplicationUserId != appUserId)
+            {
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized" }, null, false);
+                return Unauthorized(response);
+            }
+
+            await db.Post.DeleteAsync(post);
+            await db.SaveAsync();
+
+            response.SetResponseInfo(HttpStatusCode.OK, new List<string> { "Post deleted successfully" }, null, true);
+            return Ok(response);
+        }
+
+        [HttpGet("GetPostDetails")]
+        public async Task<IActionResult> GetPostInDetails(int id)
+        {
+            var response = new APIResponse();
+            var post = await db.Post.GetAsync(x => x.PostId == id);
+
+            if (post == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "Post not found" }, null, false);
+                return NotFound(response);
+            }
+            var postDto = mapper.Map<PostDetailsDTO>(post);
+            response.SetResponseInfo(HttpStatusCode.OK , null , postDto ,true);
+            return Ok(response);
+
+        }
+
+
+        [HttpPut("UpdateTweet"), Authorize]
+        public async Task<IActionResult> UpdatePost(int id , [FromBody] PostUpdatesDTO postUpdatesDTO)
+        {
+            var response = new APIResponse();
+            var post = await db.Post.GetAsync(x => x.PostId == id);
+
+            if (post == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "Post not found" }, null, false);
+                return NotFound(response);
+            }
+                
+            var appUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (appUserId == null || post.ApplicationUserId != appUserId)
+            {
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized" }, null, false);
+                return Unauthorized(response);
+            }
+
+            post.postContant = postUpdatesDTO.postContant;
+
+            await db.Post.UpdateAsync(post);
+            await db.SaveAsync();
+
+            response.SetResponseInfo(HttpStatusCode.OK, new List<string> { "Post updated successfully" }, postUpdatesDTO, true);
+            return Ok(response);
+        }
 
 
     }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAcess.Context;
 using DataAcess.Repo.IRepo;
+using Microsoft.EntityFrameworkCore;
 using Models.MyModels.ProfileModels;
 using System;
 using System.Collections.Generic;
@@ -21,14 +22,15 @@ namespace DataAcess.Repo
             _mapper = mapper;
         }
 
-        public void Update(Post post)
+        public async Task UpdateAsync(Post post)
         {
-            var postFromDb = _db.posts.FirstOrDefault(x=>x.PostId == post.PostId);
+            var postFromDb = await _db.posts.FirstOrDefaultAsync(x => x.PostId == post.PostId);
             if (postFromDb != null)
             {
-                _mapper.Map(postFromDb, post);
-                _db.SaveChanges();
+                _mapper.Map(post, postFromDb);
+                await _db.SaveChangesAsync();
             }
         }
+
     }
 }

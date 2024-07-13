@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Models.DTOs;
 using Models.DTOs.AppUsers;
+using Models.DTOs.Post;
 using Models.DTOs.User;
 using Models.MyModels.App;
 using Models.MyModels.ProfileModels;
@@ -22,6 +23,8 @@ namespace Models.Mapper
                       .ForMember(userDto => userDto.UserID, user => user.MapFrom(x => x.Id));
             CreateMap<ApplicationUserToAddUserDTO, ApplicationUser>().ReverseMap();
             CreateMap<PostDTO, Post>().ReverseMap();
+            CreateMap<PostDetailsDTO, Post>().ReverseMap();
+            CreateMap<PostUpdatesDTO, Post>().ReverseMap();
             CreateMap<UserDTO, ApplicationUser>().ReverseMap();
 
         }

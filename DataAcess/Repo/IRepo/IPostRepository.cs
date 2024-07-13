@@ -9,8 +9,7 @@ namespace DataAcess.Repo.IRepo
 {
     public interface IPostRepository : IRepository<Post>
     {
-        void Update(Post post);
-
+        Task UpdateAsync(Post post);
 
 
     }
