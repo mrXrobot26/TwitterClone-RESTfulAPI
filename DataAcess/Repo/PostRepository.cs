@@ -24,7 +24,7 @@ namespace DataAcess.Repo
 
         public async Task UpdateAsync(Post post)
         {
-            var postFromDb = await _db.posts.FirstOrDefaultAsync(x => x.PostId == post.PostId);
+            var postFromDb = await _db.Posts.FirstOrDefaultAsync(x => x.PostId == post.PostId);
             if (postFromDb != null)
             {
                 _mapper.Map(post, postFromDb);

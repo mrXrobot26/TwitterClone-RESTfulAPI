@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs.Post;
+using Models.DTOs.PostComment;
 using Models.MyModels.App;
 using Models.MyModels.PostFolder;
 using Models.MyModels.ProfileModels;
@@ -94,7 +95,7 @@ namespace TwitterClone.Controllers
         public async Task<IActionResult> GetPostInDetails(int id)
         {
             var response = new APIResponse();
-            var post = await db.Post.GetAsync(x => x.PostId == id);
+            var post = await db.Post.GetAsync(x => x.PostId == id , includes: "PostComments");
 
             if (post == null)
             {
@@ -102,6 +103,7 @@ namespace TwitterClone.Controllers
                 return NotFound(response);
             }
             var postDto = mapper.Map<PostDetailsDTO>(post);
+            postDto.Comments = mapper.Map<ICollection<PostCommentDTO>>(post.PostComments);
             response.SetResponseInfo(HttpStatusCode.OK , null , postDto ,true);
             return Ok(response);
 

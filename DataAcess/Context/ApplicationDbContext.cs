@@ -10,8 +10,9 @@ namespace DataAcess.Context
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        public DbSet<Post> posts { get; set; }
+        public DbSet<Post> Posts { get; set; }
         public DbSet<PostLike> PostLikes { get; set; }
+        public DbSet<PostComment> PostComments { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -34,6 +35,22 @@ namespace DataAcess.Context
                 .WithMany(u => u.PostLikes)
                 .HasForeignKey(pl => pl.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<PostComment>()
+                .HasOne(pl => pl.Post)
+                .WithMany(p => p.PostComments)
+                .HasForeignKey(pl => pl.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PostComment>()
+                .HasOne(pl => pl.ApplicationUser)
+                .WithMany(u => u.PostComments   )
+                .HasForeignKey(pl => pl.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
         }
     }
 

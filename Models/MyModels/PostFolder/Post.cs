@@ -17,7 +17,7 @@ namespace Models.MyModels.ProfileModels
         public ApplicationUser ApplicationUser { get; set; }
 
         public ICollection<PostLike> PostLikes { get; set; }
-
+        public ICollection<PostComment> PostComments { get; set; }
 
     }
 }

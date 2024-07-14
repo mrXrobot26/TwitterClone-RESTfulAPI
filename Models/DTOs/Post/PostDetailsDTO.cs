@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models.DTOs.PostComment;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,8 @@ namespace Models.DTOs.Post
         public int RetweetCount { get; set; }
 
         public int ReplyCount { get; set; }
+
+        public ICollection<PostCommentDTO> Comments { get; set; }
 
     }
 }

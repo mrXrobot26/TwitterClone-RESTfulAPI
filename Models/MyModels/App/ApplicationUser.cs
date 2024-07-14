@@ -23,8 +23,7 @@ namespace Models.MyModels.App
         public List<Post> Posts { get; set; }
 
         public ICollection<PostLike> PostLikes { get; set; }
-
-
+        public ICollection<PostComment> PostComments { get; set; }
 
     }
 }

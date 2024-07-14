@@ -27,7 +27,7 @@ namespace DataAcess.Repo
         {
             await _db.PostLikes.AddAsync(postLike);
 
-            var post = await _db.posts.FirstOrDefaultAsync(p => p.PostId == postLike.PostId);
+            var post = await _db.Posts.FirstOrDefaultAsync(p => p.PostId == postLike.PostId);
             if (post != null)
             {
                 post.LikesCount++;
@@ -42,7 +42,7 @@ namespace DataAcess.Repo
             {
                 _db.PostLikes.Remove(postLike);
 
-                var post = await _db.posts.FirstOrDefaultAsync(p => p.PostId == postId);
+                var post = await _db.Posts.FirstOrDefaultAsync(p => p.PostId == postId);
                 if (post != null)
                 {
                     post.LikesCount--;

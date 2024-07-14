@@ -2,8 +2,10 @@
 using Models.DTOs;
 using Models.DTOs.AppUsers;
 using Models.DTOs.Post;
+using Models.DTOs.PostComment;
 using Models.DTOs.User;
 using Models.MyModels.App;
+using Models.MyModels.PostFolder;
 using Models.MyModels.ProfileModels;
 using System;
 using System.Collections.Generic;
@@ -25,6 +27,7 @@ namespace Models.Mapper
             CreateMap<PostDTO, Post>().ReverseMap();
             CreateMap<PostDetailsDTO, Post>().ReverseMap();
             CreateMap<PostUpdatesDTO, Post>().ReverseMap();
+            CreateMap<PostComment, PostCommentDTO>().ReverseMap();
             CreateMap<UserDTO, ApplicationUser>().ReverseMap();
 
         }
