@@ -10,7 +10,7 @@ namespace DataAcess.Repo.IRepo
     {
         IPostRepository Post { get; }
         IUserRepository User { get; }
-
+        IPostLikeRepository PostLike { get; }
         Task SaveAsync();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Models.MyModels.PostFolder;
 using Models.MyModels.ProfileModels;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace Models.MyModels.App
         public string Gender { get; set; }
         //  [JsonIgnore]
         public List<Post> Posts { get; set; }
+
+        public ICollection<PostLike> PostLikes { get; set; }
 
 
 

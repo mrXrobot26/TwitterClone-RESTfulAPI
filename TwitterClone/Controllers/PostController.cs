@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Azure;
+using DataAcess.Repo;
 using DataAcess.Repo.IRepo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs.Post;
 using Models.MyModels.App;
+using Models.MyModels.PostFolder;
 using Models.MyModels.ProfileModels;
 using Models.Response;
 using System.Net;
@@ -30,6 +32,7 @@ namespace TwitterClone.Controllers
             this.db = db;
             this.mapper = mapper;
         }
+
 
         [HttpPost("AddTweet") , Authorize]
         public async Task<IActionResult> AddPost([FromBody] PostDTO postDTO)
@@ -58,6 +61,8 @@ namespace TwitterClone.Controllers
             response.SetResponseInfo(HttpStatusCode.Created, null, postDTO);
             return Ok(response);
         }
+
+
 
         [HttpDelete("DeleteTweet"), Authorize]
         public async Task<IActionResult> DeletePost(int id)
@@ -130,6 +135,50 @@ namespace TwitterClone.Controllers
             response.SetResponseInfo(HttpStatusCode.OK, new List<string> { "Post updated successfully" }, postUpdatesDTO, true);
             return Ok(response);
         }
+
+
+
+        [HttpPost("LikePost"), Authorize]
+        public async Task<IActionResult> LikePost(int postId)
+        {
+            var response = new APIResponse();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "User not found" }, null, true);
+                return Ok(response);
+            }
+
+            if (await db.PostLike.IsPostLikedByUser(postId, userId))
+            {
+                await db.PostLike.UnlikePost(postId, userId);
+                response.SetResponseInfo(HttpStatusCode.OK, new List<string> { "Post alrady Liked Unliked" },  new {postId , userId}, true);
+                return Ok(response);
+            }
+
+            var postLike = new PostLike
+            {
+                PostId = postId,
+                ApplicationUserId = userId
+            };
+
+            await db.PostLike.LikePost(postLike);
+            await db.SaveAsync();
+
+            return Ok(new { message = "Post liked successfully" });
+        }
+
+
+
+
+
+
+
+
+
+
+
 
 
     }
