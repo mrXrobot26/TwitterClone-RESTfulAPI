@@ -14,7 +14,7 @@ namespace Models.DTOs.AppUsers
         public string Bio { get; set; }
         public string Location { get; set; }
         public string Link { get; set; }
-        public DateOnly Birthday { get; set; }
+        public DateTime Birthday { get; set; }
         public DateTime JoinTime { get; set; }
         public string Gender { get; set; }
 

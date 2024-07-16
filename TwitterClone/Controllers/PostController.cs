@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTOs;
 using Models.DTOs.Post;
 using Models.DTOs.PostComment;
 using Models.MyModels.App;
@@ -95,19 +96,20 @@ namespace TwitterClone.Controllers
         public async Task<IActionResult> GetPostInDetails(int id)
         {
             var response = new APIResponse();
-            var post = await db.Post.GetAsync(x => x.PostId == id , includes: "PostComments");
+            var post = await db.Post.GetAsync(x => x.PostId == id, includes: "PostComments.ApplicationUser");
 
             if (post == null)
             {
                 response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "Post not found" }, null, false);
                 return NotFound(response);
             }
+
             var postDto = mapper.Map<PostDetailsDTO>(post);
             postDto.Comments = mapper.Map<ICollection<PostCommentDTO>>(post.PostComments);
-            response.SetResponseInfo(HttpStatusCode.OK , null , postDto ,true);
+            response.SetResponseInfo(HttpStatusCode.OK, null, postDto, true);
             return Ok(response);
-
         }
+
 
 
         [HttpPut("UpdateTweet"), Authorize]
@@ -174,6 +176,20 @@ namespace TwitterClone.Controllers
 
 
 
+        [HttpPost("LikesOnPost"), Authorize]
+        public async Task<IActionResult> GetLikesOnPost(int postId)
+        {
+            var response = new APIResponse();
+            var usersWhoLikesMyTweet = await db.PostLike.GetUsersWhoLikedPost(postId);
+            if (usersWhoLikesMyTweet == null || !usersWhoLikesMyTweet.Any())
+            {
+                response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "No likes found for this post" }, null, false);
+                return NotFound(response);
+            }
+            var usersWhoLikedDto = mapper.Map<IEnumerable<UserLikeDTO>>(usersWhoLikesMyTweet);
+            response.SetResponseInfo(HttpStatusCode.OK, new List<string> {}, usersWhoLikedDto, true);
+            return Ok(response);
+        }
 
 
 

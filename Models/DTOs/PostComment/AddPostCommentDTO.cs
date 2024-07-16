@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Models.DTOs.PostComment
 {
-    public class PostCommentDTO
+    public class AddPostCommentDTO
     {
-        public string UserName  { get; set; }
         public string CommentContant { get; set; }
+
     }
 }

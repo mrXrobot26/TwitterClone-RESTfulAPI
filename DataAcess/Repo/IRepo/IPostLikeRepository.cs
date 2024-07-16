@@ -1,4 +1,5 @@
-﻿using Models.MyModels.PostFolder;
+﻿using Models.MyModels.App;
+using Models.MyModels.PostFolder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace DataAcess.Repo.IRepo
         Task<bool> IsPostLikedByUser(int postId, string userId);
         Task LikePost(PostLike postLike);
         Task UnlikePost(int postId, string userId);
+        Task<IEnumerable<ApplicationUser>> GetUsersWhoLikedPost(int PostId);   
     }
 }

@@ -15,42 +15,42 @@ namespace TwitterClone.Controllers
     [ApiController]
     public class CommentsController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly APIResponse _response;
+        private readonly IUnitOfWork db;
+        private readonly IMapper mapper;
+        private readonly APIResponse response;
 
         public CommentsController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            _response = new APIResponse();
+            db = unitOfWork;
+            this.mapper = mapper;
+            response = new APIResponse();
         }
 
         [HttpPost("AddComment"), Authorize]
-        public async Task<IActionResult> AddComment(int PostId , [FromBody] PostCommentDTO postCommentDTO)
+        public async Task<IActionResult> AddComment(int PostId , [FromBody] AddPostCommentDTO postCommentDTO)
         {
             if (!ModelState.IsValid)
             {
-                _response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid input data" }, null, false);
-                return BadRequest(_response);
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid input data" }, null, false);
+                return BadRequest(response);
             }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
             {
-                _response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized" }, null, false);
-                return Unauthorized(_response);
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized" }, null, false);
+                return Unauthorized(response);
             }
 
-            var postComment = _mapper.Map<PostComment>(postCommentDTO);
+            var postComment = mapper.Map<PostComment>(postCommentDTO);
             postComment.ApplicationUserId = userId;
             postComment.PostId = PostId;
 
-            await _unitOfWork.PostComment.AddCommentAsync(postComment);
-            await _unitOfWork.SaveAsync();
+            await db.PostComment.AddCommentAsync(postComment);
+            await db.SaveAsync();
 
-            _response.SetResponseInfo(HttpStatusCode.Created, new List<string> { "Comment added successfully" }, postCommentDTO, true);
-            return Ok(_response);
+            response.SetResponseInfo(HttpStatusCode.Created, new List<string> { "Comment added successfully" }, postCommentDTO, true);
+            return Ok(response);
         }
 
         [HttpDelete("DeleteComment/{commentId}"), Authorize]
@@ -59,32 +59,23 @@ namespace TwitterClone.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
             {
-                _response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized" }, null, false);
-                return Unauthorized(_response);
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized" }, null, false);
+                return Unauthorized(response);
             }
 
             try
             {
-                await _unitOfWork.PostComment.DeleteCommentAsync(commentId, userId);
-                await _unitOfWork.SaveAsync();
-                _response.SetResponseInfo(HttpStatusCode.OK, new List<string> { "Comment deleted successfully" }, null, true);
-                return Ok(_response);
+                await db.PostComment.DeleteCommentAsync(commentId, userId);
+                await db.SaveAsync();
+                response.SetResponseInfo(HttpStatusCode.OK, new List<string> { "Comment deleted successfully" }, null, true);
+                return Ok(response);
             }
             catch (KeyNotFoundException ex)
             {
-                _response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { ex.Message }, null, false);
-                return NotFound(_response);
+                response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { ex.Message }, null, false);
+                return NotFound(response);
             }
         }
 
-        [HttpGet("GetCommentsByPost/{postId}")]
-        public async Task<IActionResult> GetCommentsByPost(int postId)
-        {
-            var postComments = await _unitOfWork.PostComment.GetAllAsync(pc => pc.PostId == postId);
-            var postCommentDTOs = _mapper.Map<List<PostCommentDTO>>(postComments);
-
-            _response.SetResponseInfo(HttpStatusCode.OK, null, postCommentDTOs, true);
-            return Ok(_response);
-        }
     }
 }

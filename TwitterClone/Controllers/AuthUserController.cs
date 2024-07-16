@@ -64,7 +64,6 @@ namespace TwitterClone.Controllers
 
             var user = mapper.Map<ApplicationUser>(model);
 
-
             try
             {
                 var result = await userManager.CreateAsync(user, model.Password);

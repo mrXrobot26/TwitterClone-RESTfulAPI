@@ -21,14 +21,20 @@ namespace Models.Mapper
         {
 
             CreateMap<ApplicationUser, ApplicationUserDTO>().ReverseMap();
-            CreateMap<ApplicationUser, UserProfileForGetAllUsersDTO>()
-                      .ForMember(userDto => userDto.UserID, user => user.MapFrom(x => x.Id));
             CreateMap<ApplicationUserToAddUserDTO, ApplicationUser>().ReverseMap();
             CreateMap<PostDTO, Post>().ReverseMap();
             CreateMap<PostDetailsDTO, Post>().ReverseMap();
             CreateMap<PostUpdatesDTO, Post>().ReverseMap();
-            CreateMap<PostComment, PostCommentDTO>().ReverseMap();
+            CreateMap<PostComment, PostCommentDTO>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.ApplicationUser.UserName)).ReverseMap();
+            CreateMap<PostComment, AddPostCommentDTO>().ReverseMap();
             CreateMap<UserDTO, ApplicationUser>().ReverseMap();
+
+            CreateMap<ApplicationUser, UserLikeDTO>()
+                .ForMember(dest=>dest.UserID , opt=> opt.MapFrom(src=>src.Id))
+                .ForMember(dest=>dest.UserName , opt=> opt.MapFrom(src=>src.UserName)).ReverseMap();
+
+
 
         }
 
