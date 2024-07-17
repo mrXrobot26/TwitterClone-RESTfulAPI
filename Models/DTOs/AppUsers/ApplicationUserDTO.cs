@@ -17,8 +17,8 @@ namespace Models.DTOs.AppUsers
         public DateTime Birthday { get; set; }
         public DateTime JoinTime { get; set; }
         public string Gender { get; set; }
-
         public List<PostDTO> Posts { get; set; } = new List<PostDTO>();
+
 
     }
 }

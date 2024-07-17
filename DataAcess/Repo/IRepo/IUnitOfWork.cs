@@ -12,6 +12,7 @@ namespace DataAcess.Repo.IRepo
         IUserRepository User { get; }
         IPostLikeRepository PostLike { get; }
         IPostCommentRepository PostComment { get; }
+        IUserFollowRepository UserFollow { get; }
         Task SaveAsync();
     }
 }

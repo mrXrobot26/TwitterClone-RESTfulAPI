@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Models.MyModels.Follow;
 using Models.MyModels.PostFolder;
 using Models.MyModels.ProfileModels;
 using System;
@@ -24,6 +25,8 @@ namespace Models.MyModels.App
 
         public ICollection<PostLike> PostLikes { get; set; }
         public ICollection<PostComment> PostComments { get; set; }
+        public ICollection<UserFollow> Followers { get; set; }
+        public ICollection<UserFollow> Followings { get; set; }
 
     }
 }

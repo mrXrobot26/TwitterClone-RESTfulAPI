@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Models.MyModels.App;
+using Models.MyModels.Follow;
 using Models.MyModels.PostFolder;
 using Models.MyModels.ProfileModels;
 
@@ -14,6 +15,8 @@ namespace DataAcess.Context
         public DbSet<PostLike> PostLikes { get; set; }
         public DbSet<PostComment> PostComments { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<UserFollow> UserFollows { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,8 +49,20 @@ namespace DataAcess.Context
 
             modelBuilder.Entity<PostComment>()
                 .HasOne(pl => pl.ApplicationUser)
-                .WithMany(u => u.PostComments   )
+                .WithMany(u => u.PostComments)
                 .HasForeignKey(pl => pl.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserFollow>()
+                .HasOne(uf => uf.FollowerUser)
+                .WithMany(u => u.Followings)
+                .HasForeignKey(uf => uf.FollowerUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserFollow>()
+                .HasOne(uf => uf.FollowedUser)
+                .WithMany(u => u.Followers)
+                .HasForeignKey(uf => uf.FollowedUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

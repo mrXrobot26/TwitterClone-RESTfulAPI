@@ -23,6 +23,8 @@ namespace DataAcess.Repo
 
         public IPostCommentRepository PostComment { get; private set; }
 
+        public IUserFollowRepository UserFollow { get; private set; }
+
         private readonly IConfiguration configuration;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
@@ -37,6 +39,7 @@ namespace DataAcess.Repo
             User = new UserRepository(db, configuration, userManager, mapper, roleManager);
             PostLike = new PostLikeRepository(_db);
             PostComment = new PostCommentRepository(_db);
+            UserFollow = new UserFollowRepository(_db);
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Models.DTOs;
 using Models.DTOs.AppUsers;
+using Models.DTOs.Follower;
 using Models.DTOs.Post;
 using Models.DTOs.PostComment;
 using Models.DTOs.User;
@@ -34,6 +35,10 @@ namespace Models.Mapper
                 .ForMember(dest=>dest.UserID , opt=> opt.MapFrom(src=>src.Id))
                 .ForMember(dest=>dest.UserName , opt=> opt.MapFrom(src=>src.UserName)).ReverseMap();
 
+            CreateMap<ApplicationUser, mutualFollowerDTO>()
+                .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ReverseMap();
 
 
         }
