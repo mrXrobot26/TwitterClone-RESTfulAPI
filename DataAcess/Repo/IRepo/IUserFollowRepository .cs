@@ -15,5 +15,9 @@ namespace DataAcess.Repo.IRepo
         Task UnfollowUser(string followerId, string followedId);
         Task<bool> IsFollowing(string followerId, string followedId);
         Task<IEnumerable<ApplicationUser>> GetMutualFollowers(string userId, string otherUserId);
+        Task<IEnumerable<ApplicationUser>> GetFollowers(string userId);
+        Task<IEnumerable<ApplicationUser>> GetFolloweing(string userId);
+        int GetFollowingCount(string userId);
+        int GetFollowersCount(string userId);
     }
 }

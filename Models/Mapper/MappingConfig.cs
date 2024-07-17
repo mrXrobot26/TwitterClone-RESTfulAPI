@@ -4,6 +4,7 @@ using Models.DTOs.AppUsers;
 using Models.DTOs.Follower;
 using Models.DTOs.Post;
 using Models.DTOs.PostComment;
+using Models.DTOs.TimeLine;
 using Models.DTOs.User;
 using Models.MyModels.App;
 using Models.MyModels.PostFolder;
@@ -35,11 +36,16 @@ namespace Models.Mapper
                 .ForMember(dest=>dest.UserID , opt=> opt.MapFrom(src=>src.Id))
                 .ForMember(dest=>dest.UserName , opt=> opt.MapFrom(src=>src.UserName)).ReverseMap();
 
-            CreateMap<ApplicationUser, mutualFollowerDTO>()
+            CreateMap<ApplicationUser, FollowerDTO>()
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
                 .ReverseMap();
 
+
+
+            CreateMap<Post, TimeLineDTO>()
+           .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.ApplicationUser.UserName))
+           .ForMember(dest => dest.PostContent, opt => opt.MapFrom(src => src.postContant)).ReverseMap();
 
         }
 

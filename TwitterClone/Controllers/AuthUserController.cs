@@ -61,9 +61,7 @@ namespace TwitterClone.Controllers
                 response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "User Name Already Exists" }, null, false);
                 return BadRequest(response);
             }
-
             var user = mapper.Map<ApplicationUser>(model);
-
             try
             {
                 var result = await userManager.CreateAsync(user, model.Password);
@@ -73,8 +71,7 @@ namespace TwitterClone.Controllers
                     return BadRequest(response);
                 }
 
-
-                response.SetResponseInfo(HttpStatusCode.Created, null, user, true);
+                response.SetResponseInfo(HttpStatusCode.Created, null, model, true);
                 return Ok(response);
             }
             catch (Exception ex)

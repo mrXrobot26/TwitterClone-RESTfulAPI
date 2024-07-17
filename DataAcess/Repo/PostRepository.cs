@@ -32,5 +32,20 @@ namespace DataAcess.Repo
             }
         }
 
+        public async Task<IEnumerable<Post>> GetTimelinePostsAsync(string userId)
+        {
+            var followingUserIds = _db.UserFollows
+                .Where(uf => uf.FollowerUserId == userId)
+                .Select(uf => uf.FollowedUserId);
+
+            var posts = await _db.Posts
+                .Where(p => followingUserIds.Contains(p.ApplicationUserId))
+                .Include(p => p.ApplicationUser) 
+                .OrderByDescending(p => p.PublishedDate)
+                .ToListAsync();
+
+            return posts;
+        }
+
     }
 }

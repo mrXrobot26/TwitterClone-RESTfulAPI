@@ -67,6 +67,58 @@ namespace DataAcess.Repo
                                            .ToListAsync();
             return mutualFollowers;
         }
+
+        public async Task<IEnumerable<ApplicationUser>> GetFollowers(string userId)
+        {
+            var userFollowers = await _db.UserFollows
+                                .Where(x => x.FollowedUserId == userId)
+                                .Select(x => x.FollowerUserId)
+                                .ToListAsync();
+
+            var userIFollowedProfile = await _db.Users
+                                       .Where(x => userFollowers.Contains(x.Id))
+                                       .ToListAsync();
+            return userIFollowedProfile;
+        }
+
+
+        public int GetFollowersCount(string userId)
+        {
+            var userFollowersCount = _db.UserFollows
+                                .Where(x => x.FollowedUserId == userId)
+                                .Select(x => x.FollowerUserId)
+                                .Count();
+
+            return userFollowersCount;
+        }
+        
+        public int GetFollowingCount(string userId)
+        {
+            var userFollowedCount = _db.UserFollows
+                                .Where(x => x.FollowerUserId == userId)
+                                .Select(x => x.FollowedUserId)
+                                .Count();
+
+            return userFollowedCount;
+        }
+
+
+
+
+
+        public async Task<IEnumerable<ApplicationUser>> GetFolloweing(string userId)
+        {
+            var userFollowers = await _db.UserFollows
+                                .Where(x => x.FollowerUserId == userId)
+                                .Select(x => x.FollowedUserId)
+                                .ToListAsync();
+
+            var userIFollowedProfile = await _db.Users
+                                       .Where(x => userFollowers.Contains(x.Id))
+                                       .ToListAsync();
+            return userIFollowedProfile;
+        }
+
     }
 }
 

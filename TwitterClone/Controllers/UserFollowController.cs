@@ -121,6 +121,7 @@ namespace TwitterClone.Controllers
             return Ok(response);
         }
 
+
         [HttpGet("MutualFollowers/{otherUserName}"), Authorize]
         public async Task<IActionResult> GetMutualFollowers(string otherUserName)
         {
@@ -142,11 +143,119 @@ namespace TwitterClone.Controllers
             }
 
             var mutualFollowers = await _unitOfWork.UserFollow.GetMutualFollowers(userId, otherUserId);
-            var mutualFollowersDto = _mapper.Map<List<mutualFollowerDTO>>(mutualFollowers);
+            var mutualFollowersDto = _mapper.Map<List<FollowerDTO>>(mutualFollowers);
 
             response.SetResponseInfo(HttpStatusCode.OK, null, mutualFollowersDto, true);
             return Ok(response);
         }
+
+
+
+
+
+
+        [HttpGet("GetFollowers"), Authorize]
+        public async Task<IActionResult> GetFollowers()
+        {
+            var response = new APIResponse();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized." }, null, false);
+                return BadRequest(response);
+            }
+            var followers = await _unitOfWork.UserFollow.GetFollowers(userId);
+            if (followers == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "No Followers." }, null, false);
+                return BadRequest(response);
+            }
+            var FollowersDto = _mapper.Map<List<FollowerDTO>>(followers);
+
+            response.SetResponseInfo(HttpStatusCode.OK, null, FollowersDto, true);
+            return Ok(response);
+
+        }
+        [HttpGet("GetFollowing"), Authorize]
+        public async Task<IActionResult> GetFollowing()
+        {
+            var response = new APIResponse();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized." }, null, false);
+                return BadRequest(response);
+            }
+            var following = await _unitOfWork.UserFollow.GetFolloweing(userId);
+            if (following == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "No Followers." }, null, false);
+                return BadRequest(response);
+            }
+            var FollowingDto = _mapper.Map<List<FollowerDTO>>(following);
+
+            response.SetResponseInfo(HttpStatusCode.OK, null, FollowingDto, true);
+            return Ok(response);
+
+        }
+
+        
+
+        [HttpGet("GetFollowersCount"), Authorize]
+        public async Task<IActionResult> GetFollowersCount()
+        {
+            var response = new APIResponse();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized." }, null, false);
+                return BadRequest(response);
+            }
+            var followersCont =  _unitOfWork.UserFollow.GetFollowersCount(userId);
+            if (followersCont == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "No Followers." }, null, false);
+                return BadRequest(response);
+            }
+            var followerCountObj = new
+            {
+                msg = $"you have : {followersCont}"
+            };
+            response.SetResponseInfo(HttpStatusCode.OK, null, followerCountObj, true);
+            return Ok(response);
+
+        }
+        [HttpGet("GetFollowingCount"), Authorize]
+        public async Task<IActionResult> GetFollowingCount()
+        {
+            var response = new APIResponse();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Unauthorized." }, null, false);
+                return BadRequest(response);
+            }
+            var followingCont = _unitOfWork.UserFollow.GetFollowingCount(userId);
+            if (followingCont == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "No Followers." }, null, false);
+                return BadRequest(response);
+            }
+            var followingCountObj = new
+            {
+                msg = $"you have : {followingCont}"
+            };
+            response.SetResponseInfo(HttpStatusCode.OK, null, followingCountObj, true);
+            return Ok(response);
+
+        }
+
+
+
+
+
+
+
     }
 
 

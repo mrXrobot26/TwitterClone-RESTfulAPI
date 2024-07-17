@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Models.DTOs.Follower
 {
-    public class mutualFollowerDTO
+    public class FollowerDTO
     {
-        public string UserID { get; set; }
         public string UserName { get; set; }
+        public string UserID { get; set; }
     }
 }

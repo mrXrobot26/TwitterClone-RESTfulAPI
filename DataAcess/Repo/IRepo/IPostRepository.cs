@@ -9,6 +9,7 @@ namespace DataAcess.Repo.IRepo
 {
     public interface IPostRepository : IRepository<Post>
     {
+        Task<IEnumerable<Post>> GetTimelinePostsAsync(string userId);
         Task UpdateAsync(Post post);
 
 

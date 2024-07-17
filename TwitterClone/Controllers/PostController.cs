@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
 using Models.DTOs.Post;
 using Models.DTOs.PostComment;
+using Models.DTOs.TimeLine;
 using Models.MyModels.App;
 using Models.MyModels.PostFolder;
 using Models.MyModels.ProfileModels;
@@ -193,7 +194,26 @@ namespace TwitterClone.Controllers
 
 
 
+        [HttpGet("Timeline"), Authorize]
+        public async Task<IActionResult> GetTimeline()
+        {
+            var response = new APIResponse();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.Unauthorized, new List<string> { "Invalid user ID." }, null, false);
+                return Unauthorized(response);
+            }
+
+            // Get the timeline posts
+            var posts = await db.Post.GetTimelinePostsAsync(userId);
+            var postDtos = mapper.Map<List<TimeLineDTO>>(posts);
+
+            response.SetResponseInfo(HttpStatusCode.OK, null, postDtos, true);
+            return Ok(response);
+        }
 
 
 
