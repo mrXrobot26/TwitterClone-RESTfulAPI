@@ -81,7 +81,6 @@ namespace DataAcess.Repo
             return userIFollowedProfile;
         }
 
-
         public int GetFollowersCount(string userId)
         {
             var userFollowersCount = _db.UserFollows
@@ -101,10 +100,6 @@ namespace DataAcess.Repo
 
             return userFollowedCount;
         }
-
-
-
-
 
         public async Task<IEnumerable<ApplicationUser>> GetFolloweing(string userId)
         {

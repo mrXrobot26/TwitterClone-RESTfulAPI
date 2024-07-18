@@ -53,6 +53,8 @@ namespace DataAcess.Context
                 .HasForeignKey(pl => pl.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+
+
             modelBuilder.Entity<UserFollow>()
                 .HasOne(uf => uf.FollowerUser)
                 .WithMany(u => u.Followings)

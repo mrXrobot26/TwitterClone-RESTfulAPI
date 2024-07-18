@@ -25,6 +25,7 @@ namespace TwitterClone.Controllers
             _mapper = mapper;
         }
 
+
         [HttpPost("FollowUser"), Authorize]
         public async Task<IActionResult> FollowUser(string followedUserName)
         {
@@ -32,16 +33,23 @@ namespace TwitterClone.Controllers
             var userToFollow = await _unitOfWork.User.GetAsync(x => x.UserName == followedUserName);
             if (userToFollow == null)
             {
-                
-                    response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid userName." }, null, false);
-                    return BadRequest(response);
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid username." }, null, false);
+                return BadRequest(response);
             }
+
             var followedUserId = userToFollow.Id;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (userId == null)
+            if (userId == null || followedUserId == userId)
             {
                 response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid user ID." }, null, false);
+                return BadRequest(response);
+            }
+
+            var isAlreadyFollowing = await _unitOfWork.UserFollow.GetAsync(uf => uf.FollowerUserId == userId && uf.FollowedUserId == followedUserId);
+            if (isAlreadyFollowing != null)
+            {
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "You are already following this user." }, null, false);
                 return BadRequest(response);
             }
 
@@ -50,17 +58,19 @@ namespace TwitterClone.Controllers
             {
                 Follower = userId,
                 Following = followedUserId,
-                msg ="Follow Added Sucsesfuly"
+                msg = "Follow added successfully"
             };
-            response.SetResponseInfo(HttpStatusCode.OK, new List<string> {  }, followAdd, true);
+            response.SetResponseInfo(HttpStatusCode.OK, null, followAdd, true);
             return Ok(response);
         }
+
 
         [HttpPost("UnfollowUser"), Authorize]
         public async Task<IActionResult> UnfollowUser(string followedUserName)
         {
             var response = new APIResponse();
             var userToUnfollow = await _unitOfWork.User.GetAsync(x => x.UserName == followedUserName);
+
             if (userToUnfollow == null)
             {
                 response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid username." }, null, false);
@@ -70,9 +80,16 @@ namespace TwitterClone.Controllers
             var followedUserId = userToUnfollow.Id;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (userId == null)
+            if (userId == null || followedUserId == userId)
             {
                 response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid user ID." }, null, false);
+                return BadRequest(response);
+            }
+
+            var isFollowing = await _unitOfWork.UserFollow.GetAsync(uf => uf.FollowerUserId == userId && uf.FollowedUserId == followedUserId);
+            if (isFollowing == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "You are not following this user." }, null, false);
                 return BadRequest(response);
             }
 
@@ -81,13 +98,12 @@ namespace TwitterClone.Controllers
             {
                 Unfollower = userId,
                 Unfollowing = followedUserId,
-                msg = "Follow Removed Sucsesfuly"
-
-
+                msg = "Follow removed successfully"
             };
-            response.SetResponseInfo(HttpStatusCode.OK, new List<string> { }, followRemove, true);
+            response.SetResponseInfo(HttpStatusCode.OK, null, followRemove, true);
             return Ok(response);
         }
+
 
         [HttpGet("IsFollowing"), Authorize]
         public async Task<IActionResult> IsFollowing(string followedUserName)
@@ -104,9 +120,10 @@ namespace TwitterClone.Controllers
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (userId == null)
+            var userOfToken = await _unitOfWork.User.GetAsync(x => x.Id == userId);
+            if (userId == null || followedUserName == userOfToken.UserName)
             {
-                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "UnAuthorized." }, null, false);
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid user." }, null, false);
                 return BadRequest(response);
             }
 
@@ -135,8 +152,8 @@ namespace TwitterClone.Controllers
 
             var otherUserId = otherUser.Id;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (userId == null)
+            var userOfToken = await _unitOfWork.User.GetAsync(x => x.Id == userId);
+            if (userId == null || otherUserName == userOfToken.UserName)
             {
                 response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid user ID." }, null, false);
                 return BadRequest(response);
@@ -148,10 +165,6 @@ namespace TwitterClone.Controllers
             response.SetResponseInfo(HttpStatusCode.OK, null, mutualFollowersDto, true);
             return Ok(response);
         }
-
-
-
-
 
 
         [HttpGet("GetFollowers"), Authorize]
@@ -176,6 +189,7 @@ namespace TwitterClone.Controllers
             return Ok(response);
 
         }
+
         [HttpGet("GetFollowing"), Authorize]
         public async Task<IActionResult> GetFollowing()
         {
