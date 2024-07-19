@@ -62,7 +62,7 @@ Ensure that your `appsettings.json` is correctly set up for your environment. He
     "Issuer": "YourIssuer",
     "Audience": "YourAudience"
   }
-}
+} ```
 
 #Explore the power of Twitter Clone API, where technology meets social interaction.
 
