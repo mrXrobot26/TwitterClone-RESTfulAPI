@@ -104,6 +104,7 @@ namespace TwitterClone.Controllers
                 response.SetResponseInfo(HttpStatusCode.NotFound, new List<string> { "Post not found" }, null, false);
                 return NotFound(response);
             }
+             
 
             var postDto = mapper.Map<PostDetailsDTO>(post);
             if (post.PostComments.Count != 0)
