@@ -49,9 +49,14 @@ To run Twitter Clone API:
 3. Run database migrations to initialize the data structure.
 4. Build and run the application.
 
+#Explore the power of Twitter Clone API, where technology meets social interaction.
+
+#Contact
+For any inquiries or issues, please contact the repository owner @mrXrobot26.
+
 ## Configuration
 Ensure that your `appsettings.json` is correctly set up for your environment. Here is an example:
-
+ 
 ```json
 {
   "ConnectionStrings": {
@@ -62,9 +67,5 @@ Ensure that your `appsettings.json` is correctly set up for your environment. He
     "Issuer": "YourIssuer",
     "Audience": "YourAudience"
   }
-} ```
+}
 
-#Explore the power of Twitter Clone API, where technology meets social interaction.
-
-#Contact
-For any inquiries or issues, please contact the repository owner @mrXrobot26.
