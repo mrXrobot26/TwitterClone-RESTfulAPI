@@ -263,13 +263,7 @@ namespace TwitterClone.Controllers
             return Ok(response);
 
         }
-
-
-
-
-
-
-
+        
     }
 
 

@@ -106,6 +106,10 @@ namespace TwitterClone.Controllers
             }
 
             var postDto = mapper.Map<PostDetailsDTO>(post);
+            if (post.PostComments.Count != 0)
+            {
+                postDto.userName = post.ApplicationUser.UserName;
+            }
             postDto.Comments = mapper.Map<ICollection<PostCommentDTO>>(post.PostComments);
             response.SetResponseInfo(HttpStatusCode.OK, null, postDto, true);
             return Ok(response);

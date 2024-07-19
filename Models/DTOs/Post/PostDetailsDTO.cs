@@ -10,7 +10,7 @@ namespace Models.DTOs.Post
     public class PostDetailsDTO
     {
         public int PostId { get; set; }
-
+        public string userName{ get; set; }
         public string postContant { get; set; }
 
         public DateTime PublishedDate { get; set; }

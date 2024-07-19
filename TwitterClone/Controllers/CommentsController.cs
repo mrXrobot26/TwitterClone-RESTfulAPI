@@ -34,7 +34,12 @@ namespace TwitterClone.Controllers
                 response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid input data" }, null, false);
                 return BadRequest(response);
             }
-
+            var post =await db.Post.GetAsync(x=>x.PostId == PostId);
+            if (post == null)
+            {
+                response.SetResponseInfo(HttpStatusCode.BadRequest, new List<string> { "Invalid Post" }, null, false);
+                return BadRequest(response);
+            }
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
             {
